@@ -22,7 +22,7 @@ export function composeImagePrompt(
   const meta = STYLE_META[style];
   const cast = characters
     .slice(0, 4)
-    .map((c) => `${c.name} (${c.appearance)}`)
+    .map((c) => `${c.name} (${c.appearance})`)
     .join("; ");
   const prompt = [
     meta.image,
