@@ -1,0 +1,261 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* Tokens — papel de tankōbon, tinta, lacre cinábrio. */
+:root {
+  --koma-bg: #efe6d6;
+  --koma-bg-elevated: #f7f1e6;
+  --koma-fg: #1c1612;
+  --koma-muted: #6f6458;
+  --koma-subtle: #8a7e72;
+  --koma-surface: #f7f1e6;
+  --koma-surface-2: #eadfcb;
+  --koma-border: color-mix(in oklab, var(--koma-fg) 14%, transparent);
+  --koma-border-strong: color-mix(in oklab, var(--koma-fg) 28%, transparent);
+  --koma-accent: #c24a32;
+  --koma-accent-fg: #f7f1e6;
+  --koma-paper: #f4ecd9;
+  --koma-ink: #1a1512;
+  --koma-balloon: #fffdf8;
+  --koma-ring: color-mix(in oklab, var(--koma-accent) 45%, transparent);
+
+  --radius-xs: 4px;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 18px;
+  --radius-xl: 28px;
+
+  --font-display: "Shippori Mincho", "Noto Serif JP", "Iowan Old Style", serif;
+  --font-sans: "Zen Kaku Gothic New", "Segoe UI", system-ui, sans-serif;
+
+  --shadow-soft: 0 18px 40px -28px color-mix(in oklab, var(--koma-ink) 45%, transparent);
+}
+
+.dark {
+  --koma-bg: #12100e;
+  --koma-bg-elevated: #1a1714;
+  --koma-fg: #f0e6d6;
+  --koma-muted: #b4a696;
+  --koma-subtle: #8a7e72;
+  --koma-surface: #1c1916;
+  --koma-surface-2: #26211c;
+  --koma-border: color-mix(in oklab, var(--koma-fg) 14%, transparent);
+  --koma-border-strong: color-mix(in oklab, var(--koma-fg) 26%, transparent);
+  --koma-accent: #d45a45;
+  --koma-accent-fg: #1a1512;
+  --koma-ring: color-mix(in oklab, var(--koma-accent) 50%, transparent);
+}
+
+@theme inline {
+  --color-bg: var(--koma-bg);
+  --color-bg-elevated: var(--koma-bg-elevated);
+  --color-fg: var(--koma-fg);
+  --color-muted: var(--koma-muted);
+  --color-subtle: var(--koma-subtle);
+  --color-surface: var(--koma-surface);
+  --color-surface-2: var(--koma-surface-2);
+  --color-border: var(--koma-border);
+  --color-border-strong: var(--koma-border-strong);
+  --color-accent: var(--koma-accent);
+  --color-accent-fg: var(--koma-accent-fg);
+  --color-paper: var(--koma-paper);
+  --color-ink: var(--koma-ink);
+  --color-balloon: var(--koma-balloon);
+  --color-ring: var(--koma-ring);
+  --font-sans: var(--font-sans);
+  --font-display: var(--font-display);
+  --radius-xs: var(--radius-xs);
+  --radius-sm: var(--radius-sm);
+  --radius-md: var(--radius-md);
+  --radius-lg: var(--radius-lg);
+  --radius-xl: var(--radius-xl);
+}
+
+@layer base {
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    background: var(--koma-bg);
+    color: var(--koma-fg);
+  }
+
+  body {
+    font-family: var(--font-sans);
+    background: var(--koma-bg);
+    color: var(--koma-fg);
+    min-height: 100dvh;
+  }
+
+  button:not(:disabled),
+  [role="button"]:not(:disabled) {
+    cursor: pointer;
+  }
+
+  h1,
+  h2,
+  h3 {
+    text-wrap: balance;
+    font-family: var(--font-display);
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  ::selection {
+    background: color-mix(in oklab, var(--koma-accent) 28%, transparent);
+    color: var(--koma-fg);
+  }
+}
+
+/* Grão de papel — sutil, não vira textura de stock. */
+.paper-grain {
+  position: relative;
+}
+.paper-grain::before {
+  content: "";
+  pointer-events: none;
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  opacity: 0.045;
+  mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='140' height='140'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)' opacity='0.55'/></svg>");
+}
+.dark .paper-grain::before {
+  mix-blend-mode: overlay;
+  opacity: 0.07;
+}
+
+.koma-page {
+  background: var(--koma-paper);
+  color: var(--koma-ink);
+  box-shadow: var(--shadow-soft);
+}
+
+.koma-panel {
+  border: 3px solid var(--koma-ink);
+  background: var(--koma-paper);
+  overflow: hidden;
+  position: relative;
+}
+
+.koma-stamp {
+  font-family: var(--font-display);
+  border: 2px solid var(--koma-accent);
+  color: var(--koma-accent);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  transform: rotate(-8deg);
+  padding: 0.2rem 0.45rem;
+  line-height: 1;
+}
+
+.koma-bubble {
+  position: relative;
+  background: var(--koma-balloon);
+  color: var(--koma-ink);
+  border: 2.5px solid var(--koma-ink);
+  padding: 0.7rem 0.95rem 0.8rem;
+  max-width: 100%;
+  filter: drop-shadow(0 6px 0 color-mix(in oklab, var(--koma-ink) 8%, transparent));
+}
+.koma-bubble p {
+  font-weight: 500;
+  line-height: 1.45;
+  font-size: 0.92rem;
+}
+.koma-bubble .speaker {
+  display: block;
+  font-size: 0.65rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--koma-accent);
+  margin-bottom: 0.2rem;
+  font-weight: 700;
+}
+.koma-bubble.normal {
+  border-radius: 1.7rem 1.7rem 1.7rem 0.7rem;
+}
+.koma-bubble.shout {
+  border-radius: 0.4rem;
+  border-width: 3px;
+  transform: rotate(-1.2deg);
+  font-weight: 700;
+}
+.koma-bubble.whisper {
+  border-style: dashed;
+  border-width: 2px;
+  border-radius: 1.4rem;
+  opacity: 0.95;
+}
+.koma-bubble.thought {
+  border-radius: 2.4rem;
+  border-style: dotted;
+  border-width: 2.5px;
+}
+
+.koma-narration {
+  background: color-mix(in oklab, var(--koma-ink) 88%, #3a2a20);
+  color: var(--koma-paper);
+  font-family: var(--font-display);
+  font-size: 0.92rem;
+  line-height: 1.5;
+  padding: 0.7rem 0.9rem;
+  border: 2px solid var(--koma-ink);
+}
+
+.ink-panel-fallback {
+  background:
+    radial-gradient(800px 420px at 20% 10%, color-mix(in oklab, var(--koma-accent) 16%, transparent), transparent 55%),
+    linear-gradient(180deg, #f3e4c4 0%, #e7d3ae 42%, #c9b48a 100%);
+  background-color: var(--koma-paper);
+}
+
+.ink-wash {
+  background:
+    radial-gradient(1200px 500px at 10% -10%, color-mix(in oklab, var(--koma-accent) 10%, transparent), transparent 50%),
+    radial-gradient(900px 400px at 100% 0%, color-mix(in oklab, var(--koma-fg) 6%, transparent), transparent 45%);
+}
+
+.shimmer {
+  background: linear-gradient(
+    110deg,
+    var(--koma-surface-2) 0%,
+    var(--koma-surface) 40%,
+    var(--koma-surface-2) 80%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.6s linear infinite;
+}
+
+@keyframes shimmer {
+  to {
+    background-position: -200% 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .shimmer {
+    animation: none;
+  }
+  .paper-grain::before {
+    display: none;
+  }
+}
+
+@media print {
+  .no-print {
+    display: none !important;
+  }
+  body {
+    background: white;
+  }
+  .koma-page {
+    box-shadow: none;
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+}

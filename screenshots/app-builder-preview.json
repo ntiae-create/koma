@@ -1,0 +1,36 @@
+{
+  "url": "http://127.0.0.1:8080/",
+  "viewports": {
+    "desktop": {
+      "width": 1280,
+      "height": 800,
+      "status": 200,
+      "title": "Koma",
+      "hasCanvas": false,
+      "bodyTextLen": 975,
+      "bodyTextHash": "c410b8e6eae07724d50d9e7d22d133eaf6f2684b7a59c4456b494eba4e07cc1a",
+      "bodyTextPrefix": "Koma 第1話 · NOVO CAPÍTULO Escreva o mundo. Nós desenhamos as pági",
+      "horizontalOverflow": false,
+      "consoleErrors": [],
+      "pageErrors": [],
+      "screenshot": "/workspace/screenshots/app-builder-preview.png"
+    },
+    "mobile": {
+      "width": 390,
+      "height": 844,
+      "status": 200,
+      "title": "Koma",
+      "hasCanvas": false,
+      "bodyTextLen": 975,
+      "bodyTextHash": "c410b8e6eae07724d50d9e7d22d133eaf6f2684b7a59c4456b494eba4e07cc1a",
+      "bodyTextPrefix": "Koma 第1話 · NOVO CAPÍTULO Escreva o mundo. Nós desenhamos as pági",
+      "horizontalOverflow": false,
+      "consoleErrors": [],
+      "pageErrors": [],
+      "screenshot": "/workspace/screenshots/app-builder-preview-mobile.png"
+    }
+  },
+  "brandWarnings": [],
+  "authWarnings": [],
+  "verdictFile": "/workspace/screenshots/app-builder-preview.json"
+}
