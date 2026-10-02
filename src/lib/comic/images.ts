@@ -22,7 +22,7 @@ export function composeImagePrompt(
   const meta = STYLE_META[style];
   const cast = characters
     .slice(0, 4)
-    .map((c) => `${c.name} (${c.appearance})`)
+    .map((c) => `${c.name} (${c.appearance)}`)
     .join("; ");
   const prompt = [
     meta.image,
@@ -85,24 +85,22 @@ async function fetchPollinationsImage(prompt: string, seed: number, attempt: num
     const contentType = response.headers.get("content-type") ?? "image/png";
     const mimeType = contentType.startsWith("image/") ? contentType : "image/png";
 
-    // Tentar converter para base64 apenas se estiver em Node.js (servidor)
+    // Só converte para base64 no servidor. Browser não tem Buffer válido.
     if (typeof Buffer !== "undefined") {
       try {
         const bytes = Buffer.from(await response.arrayBuffer());
         return `data:${mimeType};base64,${bytes.toString("base64")}`;
       } catch {
-        // Se falhar a conversão, retorna a URL direta como fallback
         return url;
       }
     }
 
-    // Se estiver em contexto browser, retorna a URL direta
     return url;
   } catch (error) {
     if (attempt < MAX_PROXY_ATTEMPTS) {
       return fetchPollinationsImage(prompt, randomSeed(), attempt + 1);
     }
-    // Última tentativa falhou, retorna a URL direta como fallback final
+    // Último recurso: retorna a URL direta para não trancar o painel.
     return buildImageUrl(prompt, seed);
   } finally {
     clearTimeout(timeout);
@@ -127,7 +125,7 @@ export async function resolveImageUrl(prompt: string, seed: number): Promise<str
   try {
     return await getImageUrl({ data: { prompt, seed } });
   } catch {
-    // Se tudo falhar, retorna URL direta como último recurso
+    // Se tudo falhar, retorna URL direta como último recurso.
     return buildImageUrl(prompt, seed);
   }
 }
@@ -176,7 +174,11 @@ export async function buildComic(
   };
 }
 
-export async function regeneratePanelImage(comic: Comic, panelId: string, visualOverride?: string): Promise<Comic> {
+export async function regeneratePanelImage(
+  comic: Comic,
+  panelId: string,
+  visualOverride?: string,
+): Promise<Comic> {
   const seed = randomSeed();
   const nextVisual = visualOverride ?? comic.panels.find((p) => p.id === panelId)?.visual ?? "";
 
