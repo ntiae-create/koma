@@ -3,7 +3,7 @@ import { IMAGE_SAFETY, STYLE_META } from "./styles";
 import type { Comic, Panel, StoryDraft, SubStyle } from "./types";
 
 const POLLINATIONS = "https://image.pollinations.ai/prompt";
-const MAX_PROXY_ATTEMPTS = 3;
+const MAX_PROXY_ATTEMPTS = 2;
 
 function randomSeed() {
   return Math.floor(Math.random() * 1_000_000_000);
@@ -56,6 +56,13 @@ export function withNewSeed(url: string, seed: number): string {
   }
 }
 
+/**
+ * Busca imagem do Pollinations no servidor com retry automático.
+ * Retorna a URL da imagem ou tenta com seed diferente até MAX_PROXY_ATTEMPTS vezes.
+ * Se usar base64, é convertido para data URL; caso contrário, retorna a URL direta.
+ * Timeout: 25s por tentativa.
+ * Motivo: evitar 402, timeouts e bloqueios regionais que o browser Pollinations pode sofrer.
+ */
 async function fetchPollinationsImage(prompt: string, seed: number, attempt: number): Promise<string> {
   const url = buildImageUrl(prompt, seed);
   const controller = new AbortController();
@@ -77,13 +84,26 @@ async function fetchPollinationsImage(prompt: string, seed: number, attempt: num
 
     const contentType = response.headers.get("content-type") ?? "image/png";
     const mimeType = contentType.startsWith("image/") ? contentType : "image/png";
-    const bytes = Buffer.from(await response.arrayBuffer());
-    return `data:${mimeType};base64,${bytes.toString("base64")}`;
+
+    // Tentar converter para base64 apenas se estiver em Node.js (servidor)
+    if (typeof Buffer !== "undefined") {
+      try {
+        const bytes = Buffer.from(await response.arrayBuffer());
+        return `data:${mimeType};base64,${bytes.toString("base64")}`;
+      } catch {
+        // Se falhar a conversão, retorna a URL direta como fallback
+        return url;
+      }
+    }
+
+    // Se estiver em contexto browser, retorna a URL direta
+    return url;
   } catch (error) {
     if (attempt < MAX_PROXY_ATTEMPTS) {
       return fetchPollinationsImage(prompt, randomSeed(), attempt + 1);
     }
-    throw error;
+    // Última tentativa falhou, retorna a URL direta como fallback final
+    return buildImageUrl(prompt, seed);
   } finally {
     clearTimeout(timeout);
   }
@@ -99,7 +119,7 @@ export const getImageUrl = createServerFn({ method: "POST" })
     return { prompt, seed };
   })
   .handler(async ({ data }): Promise<string> => {
-    // Proxy no servidor para evitar 402, timeouts e bloqueios regionais do Pollinations no browser.
+    // Proxy no servidor: 1 tentativa inicial + até MAX_PROXY_ATTEMPTS retries.
     return fetchPollinationsImage(data.prompt, data.seed, 1);
   });
 
@@ -107,6 +127,7 @@ export async function resolveImageUrl(prompt: string, seed: number): Promise<str
   try {
     return await getImageUrl({ data: { prompt, seed } });
   } catch {
+    // Se tudo falhar, retorna URL direta como último recurso
     return buildImageUrl(prompt, seed);
   }
 }
