@@ -52,7 +52,7 @@ export function StudioApp() {
     try {
       const result = await generateStory({ data: input });
       setStep("Preparando os pincéis…");
-      const next = buildComic(result.draft, input, result.source);
+      const next = await buildComic(result.draft, input, result.source);
       persist(next);
       if (result.source === "local") {
         toast.message("Roteiro local — a arte segue o mesmo estilo.");
@@ -63,7 +63,7 @@ export function StudioApp() {
         readerRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
       });
     } catch {
-      const next = buildComic(buildFallbackStory(input.prompt, input.style, input.panelCount), input, "local");
+      const next = await buildComic(buildFallbackStory(input.prompt, input.style, input.panelCount), input, "local");
       persist(next);
       toast.message("Usamos um roteiro reserva. A arte continua no estilo escolhido.");
     } finally {
@@ -72,12 +72,12 @@ export function StudioApp() {
     }
   }
 
-  function loadExample() {
+  async function loadExample() {
     const input = { prompt: SAMPLE_PROMPT, style: "fantasy" as const, panelCount: 8 };
     setPrompt(input.prompt);
     setStyle(input.style);
     setPanelCount(input.panelCount);
-    const next = buildComic(buildFallbackStory(input.prompt, input.style, input.panelCount), input, "local");
+    const next = await buildComic(buildFallbackStory(input.prompt, input.style, input.panelCount), input, "local");
     persist(next);
     toast.success("Exemplo carregado — as páginas estão sendo desenhadas.");
     requestAnimationFrame(() => {
@@ -99,42 +99,26 @@ export function StudioApp() {
             style: comic.style,
           },
         });
-        const seed = Math.floor(Math.random() * 1_000_000_000);
-        const updated: Comic = {
-          ...comic,
-          panels: comic.panels.map((p) =>
-            p.id === panelId
-              ? {
-                  ...p,
-                  visual: rewritten.visual || p.visual,
-                  narration: rewritten.narration || p.narration,
-                  dialogues: rewritten.dialogues.length ? rewritten.dialogues : p.dialogues,
-                  seed,
-                  imageUrl: panelImageUrl(
-                    rewritten.visual || p.visual,
-                    comic.style,
-                    comic.characters,
-                    seed,
-                  ),
-                }
-              : p,
-          ),
-        };
+        const updated = await regeneratePanelImage(
+          comic,
+          panelId,
+          rewritten.visual || panel.visual,
+        );
         persist(updated);
       } else {
-        persist(regeneratePanelImage(comic, panelId));
+        persist(await regeneratePanelImage(comic, panelId));
       }
     } catch {
-      persist(regeneratePanelImage(comic, panelId));
+      persist(await regeneratePanelImage(comic, panelId));
     } finally {
       setBusyId(null);
     }
   }
 
-  function onRegenCover() {
+  async function onRegenCover() {
     if (!comic) return;
     setBusyId("cover");
-    persist(regenerateCover(comic));
+    persist(await regenerateCover(comic));
     setTimeout(() => setBusyId(null), 400);
   }
 
@@ -193,7 +177,7 @@ export function StudioApp() {
             onStyle={setStyle}
             onCount={setPanelCount}
             onGenerate={() => void runGenerate()}
-            onExample={loadExample}
+            onExample={() => void loadExample()}
           />
           {generating ? (
             <p className="mt-4 text-sm text-muted" aria-live="polite">
@@ -209,7 +193,7 @@ export function StudioApp() {
               busyId={busyId}
               exporting={exporting}
               onRegenPanel={(id) => void onRegenPanel(id)}
-              onRegenCover={onRegenCover}
+              onRegenCover={() => void onRegenCover()}
               onPdf={() => void onPdf()}
               onZip={() => void onZip()}
             />
