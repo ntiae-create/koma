@@ -5,7 +5,7 @@ import { useTheme } from "@/components/theme-provider";
 import { Button } from "@/components/ui/button";
 import { generateStory, rewritePanel } from "@/lib/comic/generate";
 import { buildFallbackStory } from "@/lib/comic/fallback";
-import { buildComic, panelImageUrl, regenerateCover, regeneratePanelImage } from "@/lib/comic/images";
+import { buildComic, regenerateCover, regeneratePanelImage } from "@/lib/comic/images";
 import { clearHistory, loadHistory, removeComic, upsertComic } from "@/lib/comic/storage";
 import type { Comic, SubStyle } from "@/lib/comic/types";
 import { ComicReader } from "./comic-reader";
